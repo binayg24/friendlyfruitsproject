@@ -11,12 +11,7 @@ A friendly, accessible project for managing/displaying information about fruits.
 Table of Contents
 - About
 - Features
-- Demo / Screenshots
 - Tech Stack & Languages
-- Usage
-- Project Structure
-- Contributing
-- Testing
 - Roadmap
 - License
 - Maintainers & Contact
