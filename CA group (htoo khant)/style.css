@@ -1,0 +1,719 @@
+body {
+    margin: 0;
+    background: #faf8f3;
+    font-family: "Lato", sans-serif; /* Recommended font */
+    color: #333;
+}
+
+/* --- Top Header (Main Layout) --- */
+.main-section {
+    width: 95%;
+    max-width: 1400px;
+    margin: 40px auto;
+}
+
+h1 {
+    font-family: 'Playfair Display', serif;
+    font-size: 32px;
+    font-weight: 600;
+}
+
+.subtitle {
+    margin-top: 5px;
+    font-size: 15px;
+    color: #666;
+}
+
+.section-title {
+    font-family: 'Playfair Display', serif;
+    margin-top: 40px;
+    font-size: 26px;
+    font-weight: 600;
+}
+
+.section-desc {
+    margin-bottom: 25px;
+    color: #666;
+    font-size: 15px;
+}
+
+/* Grid for images */
+.grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+    gap: 20px;
+    overflow: visible;
+}
+
+/* --- Menu card --- */
+.item-card {
+    background: white;
+    padding: 15px;
+    border-radius: 8px;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+    display: flex;
+    flex-direction: column; 
+    justify-content: space-between;
+}
+
+.item-card img {
+    width: 100%;
+    height: 250px;
+    object-fit: cover;
+    border-radius: 5px;
+    margin-bottom: 10px;
+}
+
+.item-card h3 {
+    font-family: 'Playfair Display', serif;
+    margin: 10px 0 5px;
+}
+
+.item-card .text {
+    font-size: 14px;
+    color: #555;
+    flex-grow: 1; /* Allows text to take up space */
+}
+
+/* --- Deal Card Enhancements --- */
+
+.item-card.deal-item {
+    border: 1px solid #8bbf41; 
+    box-shadow: 0 4px 12px rgba(139, 191, 65, 0.2); 
+    position: relative;
+    overflow: visible; 
+}
+
+.item-card.deal-item:hover {
+    transform: translateY(-5px); 
+    box-shadow: 0 8px 20px rgba(139, 191, 65, 0.3);
+}
+
+/* Deal Tag Ribbon */
+.item-card.deal-item::before {
+    content: "SPECIAL DEAL";
+    position: absolute;
+    top: 20px; 
+    right: -40px; 
+    background: #FF5733; /* Bright Orange/Red */
+    color: white;
+    padding: 5px 40px;
+    font-size: 0.75rem;
+    font-weight: 700;
+    letter-spacing: 0.5px;
+    transform: rotate(45deg); 
+    box-shadow: 0 2px 5px rgba(0, 0, 0, 0.2);
+    z-index: 5;
+    white-space: nowrap;
+}
+
+/* --- Price Styling (Enhanced for Deals) --- */
+.price {
+    margin-top: 7px;
+    font-weight: bold;
+    display: flex; /* Use flex to align prices nicely */
+    align-items: baseline;
+}
+
+.original-price {
+    text-decoration: line-through;
+    color: #999;
+    font-size: 1em; 
+    font-weight: 400; 
+    margin-right: 15px;
+}
+
+.sale-price {
+    color: #556B2F; /* Deep Green color for emphasis */
+    font-size: 1.5em; 
+    font-weight: 800; 
+}
+
+
+/* --- Footer --- */
+footer {
+    text-align: center;
+    padding: 30px;
+    margin-top: 40px;
+    color: #777;
+}
+
+/* --- Navigation Bar --- */
+.navbar {
+    width: 100%;
+    max-width: 100vw;
+    background: #ffffff;
+    border-bottom: 1px solid #ddd;
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    box-sizing: border-box;
+    overflow-x: hidden;
+}
+
+.logo {
+    font-size: 22px;
+    font-weight: bold;
+    color: #333;
+    flex-shrink: 0;
+    min-width: fit-content;
+}
+
+.nav-links {
+    list-style: none;
+    display: flex;
+    gap: 12px;
+    margin: 0;
+    padding: 0;
+}
+
+.nav-links li a {
+    text-decoration: none;
+    font-size: 15px;
+    color: #333;
+    padding: 8px 8px;
+    white-space: nowrap;
+}
+
+.nav-links li a:hover {
+    color: #8bbf41; /* Light fresh-green vibe */
+}
+
+
+/* --- 'More Details' Button (Small) --- */
+.details-btn {
+    background: #8bbf41;
+    border: none;
+    color: white;
+    cursor: pointer;
+    margin-top: 10px;
+    border-radius: 5px;
+    transition: background 0.2s;
+    width: 100%; /* Default to full width for visibility */
+}
+
+.details-btn:hover {
+    background: #76a535;
+}
+
+.details-btn.small {
+    /* Specific styling for the small button requested by the user */
+    width: auto; 
+    padding: 8px 12px;
+    font-size: 0.9rem;
+    align-self: flex-end; 
+    margin-left: auto; /* Push to the right */
+}
+
+/* --- Navbar Cart Icon --- */
+.cart-icon-wrapper {
+    font-size: 1.2rem;
+    font-weight: 700;
+    flex-shrink: 0;
+    margin-left: 15px;
+    padding-right: 10px;
+}
+.cart-icon-wrapper a {
+    text-decoration: none;
+    color: #333;
+    position: relative;
+    display: flex; 
+    align-items: center;
+    gap: 5px; 
+    font-size: 1.5rem; 
+}
+
+/* The count number next to the cart icon */
+.cart-count-text {
+    font-weight: 600; 
+    color: #333;
+    font-size: 1.2rem;
+    padding: 0;
+    position: static; 
+}
+
+/* --- Modal Background + Animation --- */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: rgba(0,0,0,0.55);
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    animation: fadeIn 0.2s ease-out;
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+/* --- Modal Box (Upgraded) --- */
+.modal-content {
+    background: #ffffff;
+    border-radius: 12px;
+    width: 92%;
+    max-width: 480px;
+    overflow: hidden;
+    position: relative;
+    box-shadow: 0 8px 40px rgba(0,0,0,0.25);
+    transform: translateY(-20px);
+    animation: slideUp 0.25s ease-out forwards;
+}
+
+@keyframes slideUp {
+    to { transform: translateY(0); }
+}
+
+/* --- Close Button --- */
+.close {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: #fff;
+    border-radius: 50%;
+    width: 34px;
+    height: 34px;
+    font-size: 22px;
+    line-height: 34px;
+    cursor: pointer;
+    text-align: center;
+    color: #333;
+    border: 1px solid #ddd;
+    transition: 0.2s;
+}
+
+.close:hover {
+    background: #f2f2f2;
+}
+
+/* Modal Image */
+.modal-content img {
+    width: 100%;
+    height: 230px;
+    object-fit: cover;
+    border-radius: 12px 12px 0 0;
+}
+
+/* Modal Text Layout */
+.modal-content h2 {
+    padding: 0 25px;
+    margin-top: 20px;
+    margin-bottom: 10px;
+    font-family: 'Playfair Display', serif;
+    font-size: 1.9rem;
+    color: #333;
+}
+
+.modal-content p {
+    padding: 0 25px;
+    color: #555;
+    font-size: 1rem;
+    line-height: 1.5;
+    margin-bottom: 20px;
+}
+
+/* Labels */
+.modal-content label {
+    padding: 0 25px;
+    font-weight: bold;
+    margin-bottom: 8px;
+    display: block;
+    color: #444;
+}
+
+/* Special Request Box */
+#modal-request {
+    width: calc(100% - 50px);
+    margin: 0 25px 20px;
+    height: 70px;
+    border-radius: 6px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    font-family: inherit;
+}
+
+/* Quantity Selector (Smooth UI) */
+.qty-selector-group {
+    margin-left: 25px;
+    border-radius: 6px;
+    border: 1px solid #ccc;
+    width: 130px;
+    display: flex;
+    justify-content: space-between;
+    padding: 0;
+    margin-bottom: 25px;
+}
+
+.qty-selector-group button {
+    background: #f4f4f4;
+    width: 40px;
+    border: none;
+    cursor: pointer;
+    font-size: 20px;
+    color: #333;
+}
+
+.qty-selector-group button:hover {
+    background: #e5e5e5;
+}
+
+/* FIX APPLIED HERE: Restrict the hiding ONLY to the Modal (for bundles). */
+.modal-content .qty-selector-group.fixed-qty button {
+    display: none; 
+}
+
+.modal-content .qty-selector-group.fixed-qty {
+    justify-content: center;
+}
+/* END FIX */
+
+/* Small quantity selector for cart items */
+.qty-selector-group.small {
+    width: 100px;
+    margin: 0;
+    height: 30px;
+}
+.qty-selector-group.small button {
+    width: 30px;
+    font-size: 16px;
+    line-height: 1;
+}
+
+#modal-qty-display, .item-qty-display {
+    font-size: 1.2rem;
+    font-weight: 700;
+    padding-top: 7px;
+}
+.item-qty-display {
+    padding-top: 4px; /* Adjust for smaller height */
+    font-size: 1rem;
+}
+
+
+/* Add to Cart Button (Clean + Premium Look) */
+.add-cart-btn {
+    width: 100%;
+    background: #8bbf41;
+    color: white;
+    padding: 18px;
+    font-size: 1.2rem;
+    font-weight: bold;
+    border: none;
+    cursor: pointer;
+    border-radius: 0 0 12px 12px;
+    transition: 0.2s;
+}
+
+.add-cart-btn:hover {
+    background: #76a535;
+}
+
+/* ====================================
+   NEW CART SIDEBAR STYLES
+   ==================================== */
+
+.sidebar {
+    height: 100%;
+    width: 400px; /* Width of the sidebar */
+    position: fixed;
+    z-index: 1000;
+    top: 0;
+    right: 0;
+    background-color: #fff;
+    overflow-y: auto; /* Scrollable content inside */
+    transition: transform 0.3s ease-out;
+    box-shadow: -4px 0 15px rgba(0, 0, 0, 0.15);
+    transform: translateX(100%); /* Start off-screen */
+    display: flex;
+    flex-direction: column; /* Allows content and footer to stack */
+    -webkit-transform: translateX(100%);
+    -ms-transform: translateX(100%);
+    transform: translateX(100%);
+}
+
+.sidebar.open {
+    transform: translateX(0); /* Slide into view */
+}
+
+/* Header (Title and Close button) */
+.sidebar-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 15px 25px;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+.sidebar-header h2 {
+    font-size: 1.2rem;
+    font-weight: 700;
+    margin: 0;
+    font-family: "Lato", sans-serif;
+}
+
+.close-sidebar {
+    font-size: 28px;
+    font-weight: 300;
+    cursor: pointer;
+    line-height: 1;
+    color: #555;
+    padding: 5px;
+}
+
+/* Cart Items Container */
+.cart-items {
+    flex-grow: 1; /* Allows this section to fill vertical space */
+    padding: 0;
+}
+
+/* Individual Cart Item */
+.cart-item {
+    display: flex;
+    padding: 15px 25px;
+    border-bottom: 1px solid #f0f0f0;
+    align-items: center;
+    gap: 15px;
+}
+
+.item-image-wrapper img {
+    width: 60px;
+    height: 60px;
+    object-fit: cover;
+    border-radius: 5px;
+    /* Resetting modal image styles for this context */
+    margin: 0;
+}
+
+.item-details {
+    flex-grow: 1;
+    display: flex;
+    flex-direction: column;
+}
+
+.item-name {
+    font-weight: 600;
+    margin: 0;
+    font-size: 0.95rem;
+}
+
+.item-price {
+    font-weight: normal;
+    font-size: 0.9rem;
+    color: #666;
+    margin: 3px 0;
+}
+
+/* Right side of the item: Total price and remove button */
+.item-total-and-remove {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+}
+
+.item-total {
+    font-weight: bold;
+    font-size: 1.1rem;
+    white-space: nowrap;
+    margin-right: 10px;
+}
+
+.remove-item {
+    background: none;
+    border: none;
+    cursor: pointer;
+    color: #888;
+    padding: 0;
+    font-size: 1.2rem;
+    line-height: 1;
+}
+/* Trash icon is nested in the HTML example */
+.trash-icon {
+    font-size: 1rem;
+    opacity: 0.6;
+}
+
+/* Cart Footer (Promo, Totals, Buttons) */
+.cart-footer {
+    padding: 20px 25px;
+    background: #fff; /* Ensure this is white */
+    border-top: 1px solid #f0f0f0;
+    /* Sticky footer effect by placing it at the bottom of the column */
+    margin-top: auto; 
+}
+
+.promo-code input {
+    width: 100%;
+    padding: 12px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+    margin-bottom: 25px;
+    font-family: inherit;
+}
+
+.total-summary {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    font-size: 1.15rem;
+    font-weight: bold;
+    margin-bottom: 8px;
+}
+.total-summary .total-price {
+    font-size: 1.2rem;
+    font-weight: 700;
+    color: #333;
+}
+
+.shipping-note {
+    font-size: 0.85rem;
+    color: #888;
+    margin: 0 0 20px 0;
+}
+
+/* Buttons in Footer */
+.checkout-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: #556B2F; /* Deep Green, matching the screenshot */
+    color: white;
+    border: none;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    margin-bottom: 10px;
+    transition: background-color 0.2s;
+}
+.checkout-btn:hover {
+    background-color: #435425;
+}
+
+.view-cart-btn {
+    width: 100%;
+    padding: 15px;
+    background-color: transparent;
+    color: #556B2F;
+    border: 1px solid #556B2F;
+    cursor: pointer;
+    font-size: 1.1rem;
+    font-weight: 600;
+    border-radius: 6px;
+    margin-bottom: 20px;
+    transition: background-color 0.2s;
+}
+.view-cart-btn:hover {
+    background-color: #e6f1d9;
+}
+
+.secure-checkout {
+    text-align: center;
+    font-size: 0.85rem;
+    color: #555;
+}
+
+/* ===============================
+   RESPONSIVE FIXES
+   =============================== */
+
+/* --- Tablet adjustments (max 992px) --- */
+@media (max-width: 992px) {
+    .navbar {
+        padding: 15px 25px;
+    }
+    .nav-links {
+        gap: 15px;
+    }
+    
+    /* Adjust sidebar width for smaller screens */
+    .sidebar {
+        width: 350px;
+    }
+}
+
+/* --- Small mobile (max 480px) --- */
+@media (max-width: 480px) {
+
+    h1 {
+        font-size: 26px;
+    }
+
+    .grid {
+        grid-template-columns: 1fr; /* Only 1 item per row */
+        gap: 15px;
+    }
+
+    .item-card {
+        padding: 12px;
+    }
+
+    .item-card img {
+        height: 200px;
+    }
+
+    /* Small More Details button alignment */
+    .details-btn.small {
+        font-size: 0.8rem;
+        padding: 6px 10px;
+        margin-top: 5px;
+    }
+
+    /* Modal improvements */
+    .modal-content {
+        width: 90%;
+        max-width: 350px;
+        -webkit-animation: slideUp 0.25s ease-out forwards;
+        animation: slideUp 0.25s ease-out forwards;
+    }
+
+    .modal-content img {
+        height: 180px;
+    }
+
+    .modal-content h2 {
+        font-size: 1.5rem;
+        padding: 0 15px;
+    }
+
+    .modal-content p {
+        padding: 0 15px;
+        font-size: 0.9rem;
+    }
+
+    #modal-request {
+        width: calc(100% - 30px);
+        margin: 0 15px 20px;
+        height: 60px;
+    }
+
+    .qty-selector-group {
+        margin-left: 15px;
+    }
+
+    /* Sidebar takes almost full width on very small screens */
+    .sidebar {
+        width: 100%;
+    }
+
+    .cart-item {
+        /* Reduce padding on tiny screens */
+        padding: 15px;
+    }
+
+    .item-total-and-remove {
+        /* Stack price and remove button vertically if space is tight */
+        flex-direction: column;
+        align-items: flex-end;
+    }
+    .item-total {
+        margin-right: 0;
+    }
+}
