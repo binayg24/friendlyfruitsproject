@@ -1,12 +1,24 @@
+/*
+|--------------------------------------------------------------------------
+| MAIN SHOPPING CART AND CHECKOUT SCRIPT
+|--------------------------------------------------------------------------
+| Handles product selection, cart management, and checkout process
+| Integrates with registration page for user authentication
+*/
+
+// Global variables for cart state
 let selectedItem = {};
 let cartItems = [];
 let cartCount = 0;
 let currentQuantity = 1;
 
-/**
- * Define product options for all bundles.
- * NOTE: The structure assumes standard item prices are known, even if discounted in the bundle.
- */
+/*
+|--------------------------------------------------------------------------
+| PRODUCT BUNDLE CHOICES DEFINITIONS
+|--------------------------------------------------------------------------
+| Defines available options for each bundle deal
+*/
+
 const SMOOTHIE_CHOICES = [
     { value: 'Energy Boost', label: 'Energy Boost Smoothie (€5.10)' },
     { value: 'Green Detox', label: 'Green Detox Smoothie (€5.50)' },
@@ -29,8 +41,15 @@ const DETOX_ENERGY_CHOICES = [
     { value: 'Beetroot Revive', label: 'Beetroot Revive (€4.90)' }
 ];
 
+/*
+|--------------------------------------------------------------------------
+| CART PERSISTENCE - LOCALSTORAGE
+|--------------------------------------------------------------------------
+*/
+
 /**
- * Load cart from localStorage
+ * Loads cart data from localStorage on page load
+ * Ensures cart persists across page refreshes
  */
 function loadCart() {
     try {
@@ -49,7 +68,8 @@ function loadCart() {
 }
 
 /**
- * Save cart to localStorage
+ * Saves current cart state to localStorage
+ * Called whenever cart is modified
  */
 function saveCart() {
     try {
@@ -63,33 +83,41 @@ function saveCart() {
     }
 }
 
+/*
+|--------------------------------------------------------------------------
+| HELPER FUNCTIONS
+|--------------------------------------------------------------------------
+*/
+
 /**
- * Utility function to format price to European currency string (e.g., "5.10").
- * @param {number} price - The price value.
- * @returns {string} Formatted price string.
+ * Formats price to European currency string
+ * @param {number} price - The price value
+ * @returns {string} Formatted price (e.g., "5.10")
  */
 function formatPrice(price) {
     return price.toFixed(2);
 }
 
 /**
- * Updates the quantity display and the dynamic price button text.
+ * Updates the modal UI with current quantity and price
  */
 function updateModalUI() {
-    document.getElementById('modal-qty-display').innerText = currentQuantity;
-    document.getElementById('modal-qty').value = currentQuantity;
+    const qtyDisplay = document.getElementById('modal-qty-display');
+    const qtyHidden = document.getElementById('modal-qty');
+
+    if (qtyDisplay) qtyDisplay.innerText = currentQuantity;
+    if (qtyHidden) qtyHidden.value = currentQuantity;
 
     const totalPrice = (selectedItem.price * currentQuantity);
     document.getElementById('modal-price-btn').innerText = formatPrice(totalPrice);
 }
 
 /**
- * Populates the three choice dropdowns based on the bundle ID.
- * @param {number} id - The item ID (905, 906, or 907).
+ * Populates bundle selector dropdowns based on bundle ID
+ * @param {number} id - The bundle item ID (905, 906, or 907)
  */
 function populateBundleSelectors(id) {
     const selectorContainer = document.getElementById('smoothie-selectors');
-    // Clear previous contents
     selectorContainer.innerHTML = '';
 
     let choices;
@@ -100,26 +128,30 @@ function populateBundleSelectors(id) {
     } else if (id === 907) {
         choices = DETOX_ENERGY_CHOICES;
     } else {
-        return; // Not a bundle, do nothing
+        return;
     }
 
     const defaultOption = '<option value="">--- Select Choice ---</option>';
     let optionsHtml = choices.map(choice => `<option value="${choice.value}">${choice.label}</option>`).join('');
 
-    // Create and append the three required selectors
+    // Create three dropdown selectors for the bundle
     for (let i = 1; i <= 3; i++) {
         const selectElement = document.createElement('select');
         selectElement.id = `bundle-choice-${i}`;
-        selectElement.className = 'choice-select';
+        selectElement.className = 'choice-select form-control';
         selectElement.innerHTML = defaultOption + optionsHtml;
         selectorContainer.appendChild(selectElement);
     }
 }
 
-// --- PRODUCT MODAL LOGIC ---
+/*
+|--------------------------------------------------------------------------
+| PRODUCT MODAL FUNCTIONS
+|--------------------------------------------------------------------------
+*/
 
 /**
- * Opens the product detail modal, populating it with the clicked item's data.
+ * Opens product detail modal with item information
  * @param {number} id - Item ID
  * @param {string} name - Item Name
  * @param {string} desc - Item Description
@@ -127,22 +159,19 @@ function populateBundleSelectors(id) {
  * @param {string} img - Image URL
  */
 function openDetails(id, name, desc, price, img, isSweet) { 
-    // Check if the item is any fixed bundle deal (905, 906, or 907)
     const isBundleDeal = (id >= 905 && id <= 907);
 
-    // 1. Set global state for the item being configured
+    // Set global state
     selectedItem = { id, name, desc, price, img, isBundleDeal };
     currentQuantity = 1;
 
-    // 2. Populate modal content
+    // Populate modal
     document.getElementById('modal-title').innerText = name;
     document.getElementById('modal-desc').innerText = desc;
     document.getElementById('modal-img').src = img;
-
-    // 3. Reset form fields
     document.getElementById('modal-request').value = "";
     
-    // 4. Handle visibility of Bundle Selectors
+    // Handle bundle selectors
     const bundleOptionsDiv = document.getElementById('bundle-options');
     if (isBundleDeal) {
         bundleOptionsDiv.style.display = 'block';
@@ -151,35 +180,35 @@ function openDetails(id, name, desc, price, img, isSweet) {
         bundleOptionsDiv.style.display = 'none';
     }
 
-    // 5. Update the quantity display and price button
     updateModalUI(); 
 
-    // 6. Hide/Show Quantity buttons based on if it's a bundle
+    // Show quantity selector
     const qtySelector = document.querySelector('.qty-selector-group');
-    
     if (qtySelector) {
         if (selectedItem.isBundleDeal) {
             currentQuantity = 1; 
             updateModalUI();
-            qtySelector.classList.add('fixed-qty');
+            qtySelector.classList.remove('fixed-qty');
         } else {
             qtySelector.classList.remove('fixed-qty');
         }
     }
 
-    // 7. Show Modal
     document.getElementById('detailsModal').style.display = "flex";
 }
 
+/**
+ * Closes the product detail modal
+ */
 function closeDetails() {
     document.getElementById('detailsModal').style.display = "none";
 }
 
+/**
+ * Changes quantity in the modal
+ * @param {number} change - Amount to change (+1 or -1)
+ */
 function changeQty(change) {
-    if (selectedItem.isBundleDeal) {
-        return;
-    }
-
     const newQty = currentQuantity + change;
     if (newQty >= 1) {
         currentQuantity = newQty;
@@ -187,20 +216,28 @@ function changeQty(change) {
     }
 }
 
-// --- CART LOGIC ---
+/*
+|--------------------------------------------------------------------------
+| CART MANAGEMENT FUNCTIONS
+|--------------------------------------------------------------------------
+*/
 
+/**
+ * Adds selected item to shopping cart
+ * Validates bundle selections and handles special requests
+ */
 function addToCart() {
     const qtyToAdd = currentQuantity; 
     let specialRequest = document.getElementById('modal-request').value.trim();
     let choicesValid = true;
     
-    // NEW: Capture Choices for ALL Bundles (ID 905, 906, 907)
+    // Handle bundle deal selections
     if (selectedItem.isBundleDeal) {
         const choice1 = document.getElementById('bundle-choice-1').value;
         const choice2 = document.getElementById('bundle-choice-2').value;
         const choice3 = document.getElementById('bundle-choice-3').value;
         
-        // Validation: Ensure 3 choices are selected
+        // Validate all three choices are selected
         if (!choice1 || !choice2 || !choice3) {
             alert(`Please select all 3 choices for your ${selectedItem.name}.`);
             choicesValid = false;
@@ -208,9 +245,8 @@ function addToCart() {
         
         if (choicesValid) {
             const bundleChoices = [choice1, choice2, choice3].join(', ');
-            
-            // Prepend the bundle choices to the special request field
-            const choiceType = selectedItem.name.includes('Smoothie') ? 'Smoothie Choices' : selectedItem.name.includes('Juice') ? 'Juice Choices' : 'Drink Choices';
+            const choiceType = selectedItem.name.includes('Smoothie') ? 'Smoothie Choices' : 
+                              selectedItem.name.includes('Juice') ? 'Juice Choices' : 'Drink Choices';
             
             if (specialRequest) {
                  specialRequest = `${choiceType}: ${bundleChoices}. Note: ${specialRequest}`;
@@ -221,10 +257,10 @@ function addToCart() {
     }
     
     if (!choicesValid && selectedItem.isBundleDeal) {
-        return; // Stop execution if bundle choices are incomplete
+        return;
     }
 
-    // Existing logic to add to cart:
+    // Check if item already exists in cart
     const existingItemIndex = cartItems.findIndex(item => item.itemId === selectedItem.id);
     let forceNewItem = selectedItem.isBundleDeal; 
 
@@ -269,7 +305,7 @@ function addToCart() {
 }
 
 /**
- * Recalculates the total item count and updates the navbar badge.
+ * Updates total item count and navbar badge
  */
 function updateCartCountAndUI() {
     let newCartCount = 0;
@@ -285,7 +321,7 @@ function updateCartCountAndUI() {
 }
 
 /**
- * Renders the contents of the cartItems array into the Cart Sidebar HTML.
+ * Renders cart items in the sidebar
  */
 function renderCartItems() {
     const cartItemsContainer = document.querySelector('.cart-items');
@@ -301,7 +337,6 @@ function renderCartItems() {
             subtotal += item.totalPrice;
             itemCount += item.qty;
 
-            // Display the Special Request in the Cart Sidebar
             const requestText = item.request ? `<p class="item-request" style="font-style: italic; color: #333; font-size: 0.85rem; margin: 3px 0 5px;">${item.request.substring(0, 70)}${item.request.length > 70 ? '...' : ''}</p>` : '';
             
             const itemHtml = `
@@ -332,7 +367,7 @@ function renderCartItems() {
         });
     }
 
-    // Update the total summary in the footer
+    // Update footer totals
     document.querySelector('.sidebar-header h2').innerText = `Cart (${itemCount} Item${itemCount === 1 ? '' : 's'})`;
     document.querySelector('.total-summary .total-price').innerText = `€${formatPrice(subtotal)}`;
     const cartCountEl = document.getElementById('cart-count');
@@ -342,22 +377,25 @@ function renderCartItems() {
 }
 
 /**
- * Toggles the visibility of the cart sidebar and refreshes the content.
+ * Opens cart sidebar
  */
 function viewCart() {
     const sidebar = document.getElementById('cartSidebar');
-    sidebar.classList.add('open');
+    sidebar.classList.add('open'); 
     renderCartItems();
 }
 
+/**
+ * Closes cart sidebar
+ */
 function closeCart() {
     document.getElementById('cartSidebar').classList.remove('open');
 }
 
 /**
- * Updates the quantity of an item directly in the cart.
- * @param {number} index - Index of the item in the cartItems array.
- * @param {number} change - +1 or -1.
+ * Updates quantity of item in cart
+ * @param {number} index - Item index in cartItems array
+ * @param {number} change - Amount to change (+1 or -1)
  */
 function updateCartItemQty(index, change) {
     const item = cartItems[index];
@@ -374,8 +412,8 @@ function updateCartItemQty(index, change) {
 }
 
 /**
- * Removes an item from the cartItems array.
- * @param {number} index - Index of the item in the cartItems array.
+ * Removes item from cart
+ * @param {number} index - Item index in cartItems array
  */
 function removeFromCart(index) {
     cartItems.splice(index, 1);
@@ -384,10 +422,20 @@ function removeFromCart(index) {
     updateCartCountAndUI();
 }
 
+/*
+|--------------------------------------------------------------------------
+| CHECKOUT PROCESS - REGISTRATION INTEGRATION
+|--------------------------------------------------------------------------
+| This function integrates with the registration page
+| Checks if user is registered before allowing checkout
+*/
+
 /**
- * Handles the checkout process.
+ * Handles checkout process
+ * Checks for user registration and redirects accordingly
  */
 function startCheckout() {
+    // Validate cart is not empty
     if (cartItems.length === 0) {
         alert("Your cart is empty. Please add items before checking out!");
         return;
@@ -395,31 +443,51 @@ function startCheckout() {
 
     closeCart(); 
     
-    const customerIsLoggedIn = false; 
+    // Check if user is registered (checks localStorage for user data)
+    const userData = localStorage.getItem('greenyStoreUser');
+    const customerIsLoggedIn = userData !== null;
 
     if (customerIsLoggedIn) {
-        alert("Welcome back! Proceeding to Payment & Shipping.");
+        // User is registered - proceed to payment
+        alert("Welcome back! Proceeding to Payment & Shipping.\n\nIn a full implementation, this would redirect to a payment gateway.");
+        // In real implementation: window.location.href = 'checkout.html';
     } else {
-        const needsToLogIn = confirm(
-            "You need to be logged in to continue.\n\n" + 
-            "Press OK to Log In to an existing account.\n" + 
-            "Press Cancel to Register a new account."
+        // User needs to register or login
+        const needsToRegister = confirm(
+            "To complete your order, please create an account or log in.\n\n" + 
+            "Press OK to Register a new account.\n" + 
+            "Press Cancel if you already have an account to Log In."
         );
         
-        if (needsToLogIn) {
-            alert("Redirecting to the Login page...");
+        if (needsToRegister) {
+            // Redirect to registration page
+            window.location.href = 'registration.html';
         } else {
-            alert("Redirecting to the Registration page...");
+            // Login not implemented yet, redirect to registration
+            alert("Login functionality will be implemented in a future phase.\n\nFor now, please register a new account.");
+            window.location.href = 'registration.html';
         }
     }
 }
+
+/*
+|--------------------------------------------------------------------------
+| PAGE INITIALIZATION
+|--------------------------------------------------------------------------
+*/
 
 // Load cart when page loads
 window.addEventListener('DOMContentLoaded', function() {
     loadCart();
 });
 
-// Making functions globally accessible is necessary for inline onclicks in HTML
+/*
+|--------------------------------------------------------------------------
+| GLOBAL FUNCTION EXPORTS
+|--------------------------------------------------------------------------
+| Make functions globally accessible for inline onclick handlers
+*/
+
 window.openDetails = openDetails;
 window.closeDetails = closeDetails;
 window.addToCart = addToCart;
