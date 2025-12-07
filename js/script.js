@@ -31,7 +31,6 @@
     if (container) {
       container.innerText = message;
       container.style.display = 'block';
-      // hide after a short time
       setTimeout(() => { container.style.display = 'none'; }, 5000);
     } else {
       alert(message);
@@ -75,12 +74,16 @@
 
   function loadCart() {
     const raw = localStorage.getItem(localKey);
+    console.log('Loading cart from localStorage:', raw);
+    
     const parsed = safeJSONParse(raw, null);
     if (parsed && Array.isArray(parsed.items)) {
       cartItems = parsed.items;
     } else {
       cartItems = [];
     }
+    
+    console.log('Cart loaded:', cartItems);
     updateCartCountAndUI();
   }
 
@@ -88,6 +91,7 @@
     try {
       const payload = { items: cartItems, updated: new Date().toISOString() };
       localStorage.setItem(localKey, JSON.stringify(payload));
+      console.log('Cart saved:', payload);
     } catch (err) {
       console.error('Failed to save cart:', err);
     }
@@ -113,7 +117,6 @@
     const defaultOption = '<option value="">--- Select Choice ---</option>';
     const optionsHtml = choices.map(c => `<option value="${c.value}">${c.label}</option>`).join('');
 
-    // Create three dropdown selectors for bundle
     for (let i=1; i<=3; i++){
       const select = document.createElement('select');
       select.id = `bundle-choice-${i}`;
@@ -147,29 +150,7 @@
       return;
     }
 
- //----
-    function openDetails(itemData) {
-    
-    const modalImg = document.getElementById('modal-img');
-    
-
-    if (itemData && itemData.imageUrl) {
- 
-        modalImg.src = itemData.imageUrl; 
-        modalImg.alt = itemData.name;
-    } else {
-
-        modalImg.src = ''; 
-    }
-
-    document.getElementById('modal-title').textContent = itemData.name;
-    document.getElementById('modal-desc').textContent = itemData.description;
-    document.getElementById('modal-price-btn').textContent = itemData.price.toFixed(2);
-    
-    document.getElementById('detailsModal').style.display = 'block'; 
-}
-//---
-
+    console.log('Opening modal for:', name);
 
     const modalTitle = qs('#modal-title');
     const modalDesc = qs('#modal-desc');
@@ -178,13 +159,14 @@
 
     if (modalTitle) modalTitle.innerText = name || '';
     if (modalDesc) modalDesc.innerText = desc || '';
-    if (modalImg && img) modalImg.src = img;
+    if (modalImg && img) {
+      modalImg.src = img;
+      modalImg.alt = name || '';
+    }
 
-    // Reset request field
     const req = qs('#modal-request'); 
     if (req) req.value = '';
 
-    // Show/hide bundle selectors
     if (bundleOptions) {
       if (isBundleDeal) {
         bundleOptions.style.display = 'block';
@@ -198,23 +180,20 @@
     modal.style.display = 'flex';
   }
 
-   function closeDetails() {
-    document.getElementById('detailsModal').style.display = 'none';
+  function closeDetails() {
     const modal = qs('#detailsModal');
-    if (modal) modal.style.display = 'none';
+    if (modal) {
+      modal.style.display = 'none';
+      console.log('Modal closed');
+    }
   }
-function changeQty(delta) {
-  const newQty = currentQuantity + (Number(change) || 0);
-    if (newQty >= 1) {
-      currentQuantity = newQty;
-      updateModalUI();
-}
-}
+
   function changeQty(change) {
     const newQty = currentQuantity + (Number(change) || 0);
     if (newQty >= 1) {
       currentQuantity = newQty;
       updateModalUI();
+      console.log('Quantity changed to:', currentQuantity);
     }
   }
   
@@ -238,6 +217,8 @@ function changeQty(delta) {
       showAlert('No item selected to add.');
       return;
     }
+
+    console.log('Adding to cart:', selectedItem);
 
     const qtyToAdd = Number(currentQuantity) || 1;
     const reqEl = qs('#modal-request');
@@ -268,6 +249,7 @@ function changeQty(delta) {
     if (existingIndex > -1) {
       cartItems[existingIndex].qty += qtyToAdd;
       cartItems[existingIndex].totalPrice = cartItems[existingIndex].price * cartItems[existingIndex].qty;
+      console.log('Updated existing item quantity');
     } else {
       cartItems.push({
         itemId: selectedItem.id,
@@ -279,11 +261,13 @@ function changeQty(delta) {
         totalPrice: (Number(selectedItem.price) || 0) * qtyToAdd,
         isBundleDeal: !!selectedItem.isBundleDeal
       });
+      console.log('Added new item to cart');
     }
 
     saveCart();
     updateCartCountAndUI();
     closeDetails();
+    showAlert(`${selectedItem.name} (${qtyToAdd}) added to cart!`);
   }
 
   function updateCartCountAndUI() {
@@ -293,13 +277,17 @@ function changeQty(delta) {
 
     const header = qs('.sidebar-header h2');
     if (header) header.innerText = `Cart (${count} Item${count === 1 ? '' : 's'})`;
-    saveCart();
+    
+    console.log('Cart count updated:', count);
   }
 
   function renderCartItems() {
     const container = qs('.cart-items');
     const totalPriceEl = qs('.total-summary .total-price');
-    if (!container) return;
+    if (!container) {
+      console.error('Cart items container not found');
+      return;
+    }
 
     container.innerHTML = '';
     let subtotal = 0;
@@ -307,6 +295,7 @@ function changeQty(delta) {
 
     if (!cartItems || cartItems.length === 0) {
       container.innerHTML = '<p style="text-align:center;padding:40px 20px;color:#777">Your cart is empty!</p>';
+      console.log('Cart is empty');
     } else {
       cartItems.forEach((item, idx) => {
         subtotal += Number(item.totalPrice) || 0;
@@ -348,6 +337,8 @@ function changeQty(delta) {
         });
         container.appendChild(el);
       });
+      
+      console.log('Cart rendered:', cartItems.length, 'items');
     }
 
     if (totalPriceEl) totalPriceEl.innerText = `€${formatPrice(subtotal)}`;
@@ -365,12 +356,15 @@ function changeQty(delta) {
     }
     sidebar.classList.add('open');
     renderCartItems();
-    updateCartCountAndUI();
+    console.log('Cart opened');
   }
 
   function closeCart() {
     const sidebar = qs('#cartSidebar');
-    if (sidebar) sidebar.classList.remove('open');
+    if (sidebar) {
+      sidebar.classList.remove('open');
+      console.log('Cart closed');
+    }
   }
 
   function updateCartItemQty(index, change) {
@@ -389,10 +383,12 @@ function changeQty(delta) {
 
   function removeFromCart(index) {
     if (index < 0 || index >= cartItems.length) return;
+    const itemName = cartItems[index].name;
     cartItems.splice(index, 1);
     saveCart();
     renderCartItems();
     updateCartCountAndUI();
+    showAlert(`${itemName} removed from cart`);
   }
 
   /*
@@ -402,31 +398,25 @@ function changeQty(delta) {
   */
 
   function startCheckout() {
+    console.log('Checkout clicked. Cart contents:', cartItems);
+    console.log('Cart length:', cartItems.length);
+    
     if (!cartItems || cartItems.length === 0) {
-      showAlert('Your cart is empty. Please add items before checking out!');
-      return;
+        showAlert('Your cart is empty! Please add items before checking out.');
+        return;
     }
     
-    closeCart();
-
-    const userData = localStorage.getItem(userKey);
-    const customerIsLoggedIn = userData !== null;
-
-    if (customerIsLoggedIn) {
-      showAlert('Welcome back! Proceeding to Payment & Shipping.\n\nIn a full implementation, this would redirect to a payment gateway.');
+    const userChoice = confirm(
+        'To complete your order, please create an account or log in.\n\n' +
+        'Press OK to Register a new account.\n' +
+        'Press Cancel if you already have an account to Log in.'
+    );
+    
+    if (userChoice) {
+        console.log('Redirecting to registration...');
+        window.location.href = 'registration.html';
     } else {
-      const needsToRegister = confirm(
-        'To complete your order, please create an account or log in.\n\n' + 
-        'Press OK to Register a new account.\n' + 
-        'Press Cancel if you already have an account to Log In.'
-      );
-      
-      if (needsToRegister) {
-        window.location.href = '../pages/registration.html';
-      } else {
-        showAlert('Login functionality will be implemented in a future phase.\n\nFor now, please register a new account.');
-        window.location.href = '../pages/registration.html';
-      }
+        showAlert('Login functionality will be available in the next phase. Please register a new account for now.');
     }
   }
 
@@ -464,10 +454,8 @@ function changeQty(delta) {
         return;
       }
 
-      // Are we opening or closing?
       const isOpen = button.classList.contains('active');
 
-      // Close all FAQs first (accordion behaviour)
       qsa('.faq-question').forEach(faqBtn => {
         const ans = faqBtn.nextElementSibling;
         faqBtn.classList.remove('active');
@@ -475,32 +463,22 @@ function changeQty(delta) {
         if (ans) {
           ans.classList.remove('show');
           ans.setAttribute('aria-hidden', 'true');
-          // reset inline styles to closed
           ans.style.maxHeight = '0px';
           ans.style.display = 'none';
         }
       });
 
       if (!isOpen) {
-        // open clicked one
         button.classList.add('active');
         button.setAttribute('aria-expanded', 'true');
-
-        // ensure answer is visible and animate
         answer.classList.add('show');
         answer.setAttribute('aria-hidden', 'false');
         answer.style.display = 'block';
 
-        // allow a moment for display:block to take effect, then set maxHeight for transition
-        // compute a reasonable maxHeight using scrollHeight
         const targetHeight = answer.scrollHeight || 400;
-        // use requestAnimationFrame to ensure style changes apply
         requestAnimationFrame(() => {
           answer.style.maxHeight = targetHeight + 'px';
         });
-      } else {
-        // closing handled by the loop above (we already removed classes)
-        // nothing else to do
       }
 
       console.debug('toggleFAQ:', button.textContent.trim().slice(0,60), '->', isOpen ? 'closed' : 'opened');
@@ -508,7 +486,6 @@ function changeQty(delta) {
       console.error('toggleFAQ error', err);
     }
   }
- 
 
   /*
   |--------------------------------------------------------------------------
@@ -664,9 +641,6 @@ function changeQty(delta) {
     return ok;
   }
 
-  // Get password elements globally (may not exist on all pages)
-  let passwordInput = null;
-  let confirmPasswordInput = null;
   let passwordStrengthBar = null;
 
   function updatePasswordStrength(password) {
@@ -798,7 +772,7 @@ function changeQty(delta) {
         successModal.style.display = 'flex';
       } else {
         setTimeout(() => {
-          window.location.href = 'index.html';
+          window.location.href = 'onlineorder.html';
         }, 1000);
       }
       
@@ -809,7 +783,7 @@ function changeQty(delta) {
   }
 
   function redirectToHome() {
-    window.location.href = '../pages/onlineorder.html';
+    window.location.href = 'onlineorder.html';
   }
 
   /*
@@ -829,7 +803,6 @@ function changeQty(delta) {
   window.startCheckout = startCheckout;
   window.toggleFAQ = toggleFAQ;
   window.redirectToHome = redirectToHome;
-  // expose handlers so inline forms / external scripts can call them if needed
   window.handleRegistrationSubmit = handleRegistrationSubmit;
   window.handleContactFormSubmit = handleContactFormSubmit;
 
@@ -839,110 +812,108 @@ function changeQty(delta) {
   |--------------------------------------------------------------------------
   */
 
-  document.addEventListener('DOMContentLoaded', function () {
-    console.log('Greeny Store script initializing...');
-    
-    loadCart();
+document.addEventListener('DOMContentLoaded', function() {
+console.log('Greeny Store script initializing...');
+loadCart();
 
-    passwordInput = qs('#password');
-    confirmPasswordInput = qs('#confirmPassword');
-    passwordStrengthBar = qs('#passwordStrength');
+passwordStrengthBar = qs('#passwordStrength');
 
-    const contactForm = qs('#contactForm');
-    if (contactForm) {
-      console.log('Contact form found - attaching handler');
-      contactForm.addEventListener('submit', handleContactFormSubmit);
-    }
+const contactForm = qs('#contactForm');
+if (contactForm) {
+  console.log('Contact form found - attaching handler');
+  contactForm.addEventListener('submit', handleContactFormSubmit);
+}
 
-    const regForm = qs('#registrationForm');
-    if (regForm) {
-      console.log('Registration form found - attaching handler');
-      regForm.addEventListener('submit', handleRegistrationSubmit);
-      
-      if (qs('#fullName')) {
-        qs('#fullName').addEventListener('blur', validateFullName);
-        qs('#fullName').addEventListener('input', function() {
-          if (this.classList.contains('is-invalid')) validateFullName();
-        });
-      }
-      
-      if (qs('#email')) {
-        qs('#email').addEventListener('blur', validateEmail);
-        qs('#email').addEventListener('input', function() {
-          if (this.classList.contains('is-invalid')) validateEmail();
-        });
-      }
-      
-      if (qs('#phone')) {
-        qs('#phone').addEventListener('blur', validatePhone);
-        qs('#phone').addEventListener('input', function() {
-          if (this.classList.contains('is-invalid')) validatePhone();
-        });
-      }
-      
-      if (qs('#address')) {
-        qs('#address').addEventListener('blur', validateAddress);
-        qs('#address').addEventListener('input', function() {
-          if (this.classList.contains('is-invalid')) validateAddress();
-        });
-      }
-      
-      if (qs('#city')) {
-        qs('#city').addEventListener('blur', validateCity);
-        qs('#city').addEventListener('input', function() {
-          if (this.classList.contains('is-invalid')) validateCity();
-        });
-      }
-      
-      if (qs('#postalCode')) {
-        qs('#postalCode').addEventListener('blur', validatePostalCode);
-        qs('#postalCode').addEventListener('input', function() {
-          if (this.classList.contains('is-invalid')) validatePostalCode();
-        });
-      }
-      
-      if (passwordInput) {
-        passwordInput.addEventListener('input', validatePassword);
-      }
-      
-      if (confirmPasswordInput) {
-        confirmPasswordInput.addEventListener('input', validateConfirmPassword);
-      }
-      
-      if (qs('#terms')) {
-        qs('#terms').addEventListener('change', validateTerms);
-      }
-    }
-
-    qsa('.faq-question').forEach(btn => {
-      btn.addEventListener('click', function () { toggleFAQ(this); });
+const regForm = qs('#registrationForm');
+if (regForm) {
+  console.log('Registration form found - attaching handler');
+  regForm.addEventListener('submit', handleRegistrationSubmit);
+  
+  if (qs('#fullName')) {
+    qs('#fullName').addEventListener('blur', validateFullName);
+    qs('#fullName').addEventListener('input', function() {
+      if (this.classList.contains('is-invalid')) validateFullName();
     });
-
-    const detailsModal = qs('#detailsModal');
-    if (detailsModal) {
-      detailsModal.addEventListener('click', function (ev) {
-        if (ev.target === detailsModal) closeDetails();
-      });
-    }
-
-    const successModal = qs('#successModal');
-    if (successModal) {
-      successModal.addEventListener('click', function (ev) {
-        if (ev.target === successModal) successModal.style.display = 'none';
-      });
-    }
-
-    document.addEventListener('keydown', function (ev) {
-      if (ev.key === 'Escape') {
-        closeDetails();
-        closeCart();
-        if (successModal) successModal.style.display = 'none';
-      }
+  }
+  
+  if (qs('#email')) {
+    qs('#email').addEventListener('blur', validateEmail);
+    qs('#email').addEventListener('input', function() {
+      if (this.classList.contains('is-invalid')) validateEmail();
     });
+  }
+  
+  if (qs('#phone')) {
+    qs('#phone').addEventListener('blur', validatePhone);
+    qs('#phone').addEventListener('input', function() {
+      if (this.classList.contains('is-invalid')) validatePhone();
+    });
+  }
+  
+  if (qs('#address')) {
+    qs('#address').addEventListener('blur', validateAddress);
+    qs('#address').addEventListener('input', function() {
+      if (this.classList.contains('is-invalid')) validateAddress();
+    });
+  }
+  
+  if (qs('#city')) {
+    qs('#city').addEventListener('blur', validateCity);
+    qs('#city').addEventListener('input', function() {
+      if (this.classList.contains('is-invalid')) validateCity();
+    });
+  }
+  
+  if (qs('#postalCode')) {
+    qs('#postalCode').addEventListener('blur', validatePostalCode);
+    qs('#postalCode').addEventListener('input', function() {
+      if (this.classList.contains('is-invalid')) validatePostalCode();
+    });
+  }
+  
+  const passwordInput = qs('#password');
+  if (passwordInput) {
+    passwordInput.addEventListener('input', validatePassword);
+  }
+  
+  const confirmPasswordInput = qs('#confirmPassword');
+  if (confirmPasswordInput) {
+    confirmPasswordInput.addEventListener('input', validateConfirmPassword);
+  }
+  
+  if (qs('#terms')) {
+    qs('#terms').addEventListener('change', validateTerms);
+  }
+}
 
-    updateModalUI();
+qsa('.faq-question').forEach(btn => {
+  btn.addEventListener('click', function () { toggleFAQ(this); });
+});
 
-    console.log('Greeny Store - Unified script.js loaded successfully');
+const detailsModal = qs('#detailsModal');
+if (detailsModal) {
+  detailsModal.addEventListener('click', function (ev) {
+    if (ev.target === detailsModal) closeDetails();
   });
+}
 
+const successModal = qs('#successModal');
+if (successModal) {
+  successModal.addEventListener('click', function (ev) {
+    if (ev.target === successModal) successModal.style.display = 'none';
+  });
+}
+
+document.addEventListener('keydown', function (ev) {
+  if (ev.key === 'Escape') {
+    closeDetails();
+    closeCart();
+    if (successModal) successModal.style.display = 'none';
+  }
+});
+
+updateModalUI();
+
+console.log('Greeny Store - Unified script.js loaded successfully');
+});
 })();
