@@ -369,7 +369,9 @@
   | CHECKOUT PROCESS - REGISTRATION INTEGRATION
   |--------------------------------------------------------------------------
   */
-
+  function redirectToHome() {
+    window.location.href = 'onlineorder.html';
+}
   function startCheckout() {
     if (!cartItems || cartItems.length === 0) {
       showAlert('Your cart is empty. Please add items before checking out!');
