@@ -265,14 +265,6 @@
     saveCart();
   }
 
-   function normalizeImagePath(path) {
-  if (!path) return '';
-  // Encode the filename part but keep the directory structure
-  const parts = path.split('/');
-  const filename = parts.pop();
-  return parts.join('/') + '/' + encodeURIComponent(filename);
-}
-   
   function renderCartItems() {
     const container = qs('.cart-items');
     const totalPriceEl = qs('.total-summary .total-price');
@@ -297,7 +289,7 @@
         el.dataset.index = idx;
         el.innerHTML = `
           <div class="item-image-wrapper">
-           <img src="${item.img}" alt="${escapeAttr(item.name)}">
+            <img src="${escapeAttr(item.img)}" alt="${escapeAttr(item.name)}">
           </div>
           <div class="item-details">
             <p class="item-name">${escapeHtml(item.name)}</p>
