@@ -402,33 +402,28 @@ function changeQty(delta) {
   */
 
   function startCheckout() {
-    if (!cartItems || cartItems.length === 0) {
-      showAlert('Your cart is empty. Please add items before checking out!');
-      return;
+    const cart = JSON.parse(localStorage.getItem('cart')) || [];
+    
+    if (cart.length === 0) {
+        alert('Your cart is empty! Please add items before checking out.');
+        return;
     }
     
-    closeCart();
-
-    const userData = localStorage.getItem(userKey);
-    const customerIsLoggedIn = userData !== null;
-
-    if (customerIsLoggedIn) {
-      showAlert('Welcome back! Proceeding to Payment & Shipping.\n\nIn a full implementation, this would redirect to a payment gateway.');
+    // Show registration prompt
+    const userChoice = confirm(
+        'To complete your order, please create an account or log in.\n\n' +
+        'Press OK to Register a new account.\n' +
+        'Press Cancel if you already have an account to Log in.'
+    );
+    
+    if (userChoice) {
+        // Redirect to registration page
+        window.location.href = 'registration.html';
     } else {
-      const needsToRegister = confirm(
-        'To complete your order, please create an account or log in.\n\n' + 
-        'Press OK to Register a new account.\n' + 
-        'Press Cancel if you already have an account to Log In.'
-      );
-      
-      if (needsToRegister) {
-        window.location.href = 'registration.html';
-      } else {
-        showAlert('Login functionality will be implemented in a future phase.\n\nFor now, please register a new account.');
-        window.location.href = 'registration.html';
-      }
+        // In future: redirect to login page
+        alert('Login functionality will be available in the next phase. Please register a new account for now.');
     }
-  }
+}
 
   /*
   |--------------------------------------------------------------------------
